@@ -1,0 +1,26 @@
+--Create Database
+CREATE or replace DATABASE GIT_REPOSITORY_DB;
+
+CREATE OR REPLACE API INTEGRATION git_api_integration
+  API_PROVIDER = git_https_api
+  API_ALLOWED_PREFIXES = ('https://github.com/Snowflake-Labs/')
+  ENABLED = TRUE;
+
+CREATE OR REPLACE GIT REPOSITORY git_repo
+    api_integration = git_api_integration
+    origin = 'https://github.com/Snowflake-Labs/sfguide-build-data-agents-using-snowflake-cortex-ai';
+
+-- Make sure we get the latest files
+ALTER GIT REPOSITORY git_repo FETCH;
+
+-- Setup stage for  Docs
+create or replace stage docs ENCRYPTION = (TYPE = 'SNOWFLAKE_SSE') DIRECTORY = ( ENABLE = true );
+
+-- Copy the docs for bikes
+COPY FILES
+    INTO @docs/
+    FROM @DASH_CORTEX_AGENTS_SUMMIT.PUBLIC.git_repo/branches/main/docs/;
+
+ALTER STAGE docs REFRESH;
+
+SELECT * FROM DIRECTORY('@DOCS');
