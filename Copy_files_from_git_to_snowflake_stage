@@ -19,7 +19,7 @@ create or replace stage docs ENCRYPTION = (TYPE = 'SNOWFLAKE_SSE') DIRECTORY = (
 -- Copy the docs for bikes
 COPY FILES
     INTO @docs/
-    FROM @DASH_CORTEX_AGENTS_SUMMIT.PUBLIC.git_repo/branches/main/docs/;
+    FROM @GIT_REPOSITORY_DB.PUBLIC.git_repo/branches/main/docs/;
 
 ALTER STAGE docs REFRESH;
 
